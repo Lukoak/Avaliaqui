@@ -1,0 +1,19 @@
+# Binários compilados do Eclipse
+/bin/
+*.class
+*.jar
+
+# Ficheiros de configuração do Eclipse
+.settings/
+.classpath
+.project
+
+# Ficheiros do Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# --- REGRAS CRUCIAIS PARA O DEPLOY NO RENDER ---
+# Garantir que o Dockerfile e o ficheiro WAR nunca sejam ignorados
+!Dockerfile
+!target/avaliaqui.war
+/build/
