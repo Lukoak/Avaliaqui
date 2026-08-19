@@ -26,7 +26,7 @@
             background-size: 100% 4px; pointer-events: none; z-index: 9999;
         }
 
-        /* --- TEMA CLARO & ACESSIBILIDADE --- */
+        /* --- BLOCO UNIVERSAL DE CONTRASTE & DESIGN SYSTEM --- */
         body.light-mode { background-color: #f8fafc; color: #0f172a; }
         body.light-mode .bg-panel { background-color: #ffffff; border-color: #94a3b8; }
         body.light-mode .border-line { border-color: #cbd5e1; }
@@ -98,8 +98,6 @@
         body.light-mode .terminal-scroll::-webkit-scrollbar-thumb { background: #94a3b8; }
 
         /* --- ANIMAÇÕES DE IMERSÃO (RIPPLE / PULSE) --- */
-        
-        /* 1. Animação da Onda da Árvore D3 */
         @keyframes haloPulse {
             0% { r: 6px; opacity: 0.8; stroke-width: 2px; }
             100% { r: 22px; opacity: 0; stroke-width: 0px; }
@@ -110,7 +108,6 @@
         .node .node-dot { transition: all 0.3s; stroke-width: 2.5px; }
         .node:hover .node-dot { box-shadow: 0 0 10px #fff; }
 
-        /* 2. Animação do Cursor (Tutorial) */
         @keyframes moveClick {
             0% { transform: translate(0px, 0px); }
             35% { transform: translate(-30px, -25px); }
@@ -120,7 +117,6 @@
         }
         .pointer-anim { animation: moveClick 3s infinite ease-in-out; }
         
-        /* 3. Animação da Bolinha do Tutorial (Modo Escuro e Claro) */
         @keyframes circleReactDark {
             0%, 40% { background-color: #a855f7; border: 2px solid transparent; }
             50%, 100% { background-color: transparent; border: 2px solid #a855f7; }
@@ -133,7 +129,6 @@
         #sim-circle { animation: circleReactDark 3s infinite ease-in-out; }
         body.light-mode #sim-circle { animation: circleReactLight 3s infinite ease-in-out; }
         
-        /* Onda do Tutorial */
         .sim-halo {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 16px; height: 16px; rounded: full; border: 2px solid #a855f7; border-radius: 50%;
@@ -145,7 +140,6 @@
             0%, 40% { width: 16px; height: 16px; opacity: 0.8; }
             50%, 100% { width: 50px; height: 50px; opacity: 0; }
         }
-
     </style>
 </head>
 <body class="bg-[#050505] text-gray-200 flex h-screen overflow-hidden font-sans select-none relative">
@@ -340,7 +334,6 @@
         root = d3.hierarchy(treeData, function(d) { return d.children; });
         root.x0 = 0; root.y0 = 0;
 
-        // Memória do localStorage
         let openNodes = JSON.parse(localStorage.getItem("openTreeNodes")) || ["Avaliaqui"];
 
         function initTreeState(d) {
@@ -376,15 +369,8 @@
                 .on('click', click)
                 .attr('cursor', 'pointer'); 
 
-            // Halo expansivo (Animação de Imersão)
-            nodeEnter.append('circle')
-                .attr('class', 'halo')
-                .attr('r', 1e-6);
-
-            // Bolinha Principal
-            nodeEnter.append('circle')
-                .attr('class', 'node-dot')
-                .attr('r', 1e-6);
+            nodeEnter.append('circle').attr('class', 'halo').attr('r', 1e-6);
+            nodeEnter.append('circle').attr('class', 'node-dot').attr('r', 1e-6);
                 
             nodeEnter.append('text')
                 .attr("dy", ".35em")
@@ -396,7 +382,6 @@
             nodeUpdate.transition().duration(duration)
                 .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
-            // Ativa a animação "Pulsar" apenas se o nó tiver filhos escondidos
             nodeUpdate.select('.halo')
                 .classed('active', d => !!d._children)
                 .style("stroke", function() { return document.body.classList.contains("light-mode") ? "#ea580c" : "#a855f7"; });
@@ -440,7 +425,7 @@
                 if (d.children) { d._children = d.children; d.children = null; } 
                 else { d.children = d._children; d._children = null; }
                 update(d);
-                saveTreeState(); // Salva a árvore no localStorage sempre que clica num nó
+                saveTreeState();
             }
         }
 
@@ -488,60 +473,51 @@
                             comentariosHtml += "<p class='text-[9px] text-gray-500 uppercase tracking-widest font-mono'>Avaliações da Comunidade sobre este relato:</p>";
                             post.avaliacoes.forEach(av => {
                                 const estrelasAv = "★".repeat(av.nota) + "☆".repeat(5 - av.nota);
-                                comentariosHtml += `
-                                <div class='bg-panel input-light p-2.5 border border-[#333] border-line'>
-                                    <div class='flex justify-between items-center mb-1'>
-                                        <span class='text-[#a855f7] font-mono text-[9px]'>@\${av.autor}</span>
-                                        <span class='text-yellow-500 font-mono text-[9px]'>\${estrelasAv} (\${av.nota}/5)</span>
-                                    </div>
-                                    <p class='text-xs text-gray-300 font-sans'>\${av.comentario}</p>
-                                </div>`;
+                                comentariosHtml += "<div class='bg-panel input-light p-2.5 border border-[#333] border-line'>" +
+                                    "<div class='flex justify-between items-center mb-1'>" +
+                                        "<span class='text-[#a855f7] font-mono text-[9px]'>@" + av.autor + "</span>" +
+                                        "<span class='text-yellow-500 font-mono text-[9px]'>" + estrelasAv + " (" + av.nota + "/5)</span>" +
+                                    "</div>" +
+                                    "<p class='text-xs text-gray-300 font-sans'>" + av.comentario + "</p>" +
+                                "</div>";
                             });
                             comentariosHtml += "</div>";
                         }
 
-                        html += `
-                        <div class="bg-[#111] input-light border border-[#333] border-line p-4 relative shadow-[2px_2px_0_rgba(0,0,0,0.5)]">
-                            <div class="flex justify-between items-start mb-2 border-b border-[#333] border-line pb-2">
-                                <span class="text-[#a855f7] font-mono text-[10px] uppercase">@\${autor}</span>
-                                <span class="text-gray-500 font-mono text-[9px]">\${post.dataFormatada}</span>
-                            </div>
-                            
-                            <div class="mb-2 font-mono text-xs text-yellow-500 bg-panel input-light p-1.5 border border-[#333] border-line">
-                                <span class="text-[9px] text-gray-400 block uppercase">Avaliação do Autor para o Produto:</span>
-                                \${estrelasAutor} (\${notaAutor}/5)
-                            </div>
-
-                            <h4 class="text-sm font-bold text-white font-mono mb-1">\${post.titulo}</h4>
-                            <p class="text-xs text-gray-400 mb-3 font-sans">\${post.descricao}</p>
-                            
-                            <div class="flex justify-between items-center mt-3 pt-2 border-t border-[#333] border-line">
-                                <span class="text-[10px] font-mono text-yellow-500">REPUTAÇÃO DO RELATO: ★ (\${mediaPost})</span>
-                                <button onclick="toggleAvaliacao('\${idPost}')" class="text-[10px] font-mono text-blue-400 hover:text-blue-300 transition-colors uppercase cursor-pointer z-10 relative">
-                                    [ AVALIAR_RELATO ]
-                                </button>
-                            </div>
-                            
-                            \${comentariosHtml}
-
-                            <div id="aval-\${idPost}" class="hidden mt-3 p-3 bg-panel input-light border border-[#333] border-line">
-                                <form action="avaliar" method="POST" class="space-y-3">
-                                    <input type="hidden" name="postagemId" value="\${idPost}">
-                                    <div class="flex items-center justify-between">
-                                        <label class="text-[9px] font-mono text-gray-500 uppercase">SUA NOTA SOBRE ESTE RELATO:</label>
-                                        <select name="nota" required class="bg-[#111] input-light border border-[#333] border-line text-[10px] text-white p-1 font-mono outline-none focus:border-[#a855f7]">
-                                            <option value="5">★★★★★ (5)</option>
-                                            <option value="4">★★★★☆ (4)</option>
-                                            <option value="3">★★★☆☆ (3)</option>
-                                            <option value="2">★★☆☆☆ (2)</option>
-                                            <option value="1">★☆☆☆☆ (1)</option>
-                                        </select>
-                                    </div>
-                                    <textarea name="comentario" rows="2" placeholder="Deixe seu comentário sobre a postagem..." class="w-full bg-[#111] input-light border border-[#333] border-line text-xs p-2 text-white outline-none focus:border-[#a855f7] font-mono"></textarea>
-                                    <button type="submit" class="btn-terminal w-full py-1 text-[10px] mt-1 cursor-pointer">[ SUBMETER AVALIAÇÃO ]</button>
-                                </form>
-                            </div>
-                        </div>`;
+                        html += "<div class='bg-[#111] input-light border border-[#333] border-line p-4 relative shadow-[2px_2px_0_rgba(0,0,0,0.5)]'>" +
+                            "<div class='flex justify-between items-start mb-2 border-b border-[#333] border-line pb-2'>" +
+                                "<span class='text-[#a855f7] font-mono text-[10px] uppercase'>@" + autor + "</span>" +
+                                "<span class='text-gray-500 font-mono text-[9px]'>" + post.dataFormatada + "</span>" +
+                            "</div>" +
+                            "<div class='mb-2 font-mono text-xs text-yellow-500 bg-panel input-light p-1.5 border border-[#333] border-line'>" +
+                                "<span class='text-[9px] text-gray-400 block uppercase'>Avaliação do Autor para o Produto:</span>" +
+                                estrelasAutor + " (" + notaAutor + "/5)" +
+                            "</div>" +
+                            "<h4 class='text-sm font-bold text-white font-mono mb-1'>" + post.titulo + "</h4>" +
+                            "<p class='text-xs text-gray-400 mb-3 font-sans'>" + post.descricao + "</p>" +
+                            "<div class='flex justify-between items-center mt-3 pt-2 border-t border-[#333] border-line'>" +
+                                "<span class='text-[10px] font-mono text-yellow-500'>REPUTAÇÃO DO RELATO: ★ (" + mediaPost + ")</span>" +
+                                "<button onclick=\"toggleAvaliacao('" + idPost + "')\" class='text-[10px] font-mono text-blue-400 hover:text-blue-300 transition-colors uppercase cursor-pointer z-10 relative'>[ AVALIAR_RELATO ]</button>" +
+                            "</div>" +
+                            comentariosHtml +
+                            "<div id='aval-" + idPost + "' class='hidden mt-3 p-3 bg-panel input-light border border-[#333] border-line'>" +
+                                "<form action='avaliar' method='POST' class='space-y-3'>" +
+                                    "<input type='hidden' name='postagemId' value='" + idPost + "'>" +
+                                    "<div class='flex items-center justify-between'>" +
+                                        "<label class='text-[9px] font-mono text-gray-500 uppercase'>SUA NOTA SOBRE ESTE RELATO:</label>" +
+                                        "<select name='nota' required class='bg-[#111] input-light border border-[#333] border-line text-[10px] text-white p-1 font-mono outline-none focus:border-[#a855f7]'>" +
+                                            "<option value='5'>★★★★★ (5)</option>" +
+                                            "<option value='4'>★★★★☆ (4)</option>" +
+                                            "<option value='3'>★★★☆☆ (3)</option>" +
+                                            "<option value='2'>★★☆☆☆ (2)</option>" +
+                                            "<option value='1'>★☆☆☆☆ (1)</option>" +
+                                        "</select>" +
+                                    "</div>" +
+                                    "<textarea name='comentario' rows='2' placeholder='Deixe seu comentário sobre a postagem...' class='w-full bg-[#111] input-light border border-[#333] border-line text-xs p-2 text-white outline-none focus:border-[#a855f7] font-mono'></textarea>" +
+                                    "<button type='submit' class='btn-terminal w-full py-1 text-[10px] mt-1 cursor-pointer'>[ SUBMETER AVALIAÇÃO ]</button>" +
+                                "</form>" +
+                            "</div>" +
+                        "</div>";
                     });
                     timeline.innerHTML = html;
                 })
@@ -555,6 +531,7 @@
         const searchInput = document.getElementById('search-input');
         const searchResults = document.getElementById('search-results');
         let todosProdutos = [];
+        let matchesGlobais = [];
 
         function mapearProdutos(node) {
             if (node.type === "produto") todosProdutos.push(node);
@@ -566,23 +543,21 @@
             const termo = this.value.toLowerCase().trim();
             if (termo.length === 0) { searchResults.classList.add('hidden'); return; }
 
-            const matches = todosProdutos.filter(p => 
+            matchesGlobais = todosProdutos.filter(p => 
                 p.name.toLowerCase().includes(termo) || p.brand.toLowerCase().includes(termo) || p.category.toLowerCase().includes(termo)
             );
 
-            if (matches.length > 0) {
+            if (matchesGlobais.length > 0) {
                 let html = '';
-                matches.forEach(match => {
-                    const matchStr = JSON.stringify(match).replace(/\"/g, '&quot;');
-                    html += `
-                    <div class="p-3 hover:bg-[#111] input-light cursor-pointer transition-colors" onclick="selecionarResultadoBusca(\\${matchStr})">
-                        <p class="text-sm font-bold text-white uppercase font-mono\">\\${match.name}</p>
-                        <p class="text-[9px] font-mono text-[#a855f7] uppercase mt-0.5">> \\${match.category} > \\${match.brand}</p>
-                    </div>`;
+                matchesGlobais.forEach((match, index) => {
+                    html += "<div class='p-3 hover:bg-[#111] input-light cursor-pointer transition-colors' onclick='selecionarResultadoBusca(" + index + ")'>" +
+                        "<p class='text-sm font-bold text-white uppercase font-mono'>" + match.name + "</p>" +
+                        "<p class='text-[9px] font-mono text-[#a855f7] uppercase mt-0.5'>> " + match.category + " > " + match.brand + "</p>" +
+                    "</div>";
                 });
                 searchResults.innerHTML = html;
             } else {
-                searchResults.innerHTML = `<div class="p-4 text-[10px] font-mono text-red-500 uppercase tracking-widest text-center">[ RESULTADO_NÃO_ENCONTRADO ]</div>`;
+                searchResults.innerHTML = "<div class='p-4 text-[10px] font-mono text-red-500 uppercase tracking-widest text-center'>[ RESULTADO_NÃO_ENCONTRADO ]</div>";
             }
             searchResults.classList.remove('hidden');
         });
@@ -591,10 +566,10 @@
             if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) searchResults.classList.add('hidden');
         });
 
-        function selecionarResultadoBusca(produto) {
+        function selecionarResultadoBusca(index) {
             searchResults.classList.add('hidden');
             searchInput.value = ''; 
-            openPanel(produto);
+            openPanel(matchesGlobais[index]);
         }
     </script>
 </body>
