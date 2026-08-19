@@ -567,40 +567,44 @@
         // --- MOTOR DE BUSCA DE PRODUTOS ---
         const searchInput = document.getElementById('search-input');
         const searchResults = document.getElementById('search-results');
-        let todosProdutos = [];
+        let todosProdutosD3 = [];
         let matchesGlobais = [];
 
-        function mapearProdutos(node) {
-            if (node.type === "produto") {
-                todosProdutos.push(node);
+        // Extrai os nós diretamente da hierarquia D3 (para podermos expandi-los)
+        function mapearProdutosD3(node) {
+            if (node.data && node.data.type === "produto") {
+                todosProdutosD3.push(node);
             }
-            if (node.children) {
-                node.children.forEach(mapearProdutos);
-            }
+            if (node.children) node.children.forEach(mapearProdutosD3);
+            if (node._children) node._children.forEach(mapearProdutosD3);
         }
         
-        if (typeof treeData !== 'undefined' && treeData) {
-            mapearProdutos(treeData);
+        // Mapeia assim que a árvore D3 for montada
+        if (typeof root !== 'undefined' && root) {
+            mapearProdutosD3(root);
         }
 
         searchInput.addEventListener('input', function() {
             const termo = this.value.toLowerCase().trim();
-            
-            searchResults.innerHTML = '';
+            searchResults.innerHTML = ''; // Limpa resultados velhos
             
             if (termo.length === 0) { 
                 searchResults.classList.add('hidden'); 
                 return; 
             }
 
-            matchesGlobais = todosProdutos.filter(p => 
-                p.name.toLowerCase().includes(termo) || 
-                p.brand.toLowerCase().includes(termo) || 
-                p.category.toLowerCase().includes(termo)
-            );
+            matchesGlobais = todosProdutosD3.filter(n => {
+                const p = n.data;
+                return p.name.toLowerCase().includes(termo) || 
+                       p.brand.toLowerCase().includes(termo) || 
+                       p.category.toLowerCase().includes(termo);
+            });
 
             if (matchesGlobais.length > 0) {
-                matchesGlobais.forEach((match, index) => {
+                matchesGlobais.forEach((matchNode, index) => {
+                    const match = matchNode.data;
+                    
+                    // DOM PURO: Imune a bugs do JSP. Aqui não há ${} para quebrar a tela.
                     const div = document.createElement('div');
                     div.className = 'p-3 hover:bg-[#111] input-light cursor-pointer transition-colors';
                     div.onclick = function() { selecionarResultadoBusca(index); };
@@ -627,6 +631,7 @@
             searchResults.classList.remove('hidden');
         });
 
+        // Fecha a barra se clicar fora
         document.addEventListener('click', function(event) {
             if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
                 searchResults.classList.add('hidden');
@@ -636,7 +641,34 @@
         function selecionarResultadoBusca(index) {
             searchResults.classList.add('hidden');
             searchInput.value = ''; 
-            openPanel(matchesGlobais[index]);
+            
+            const targetNode = matchesGlobais[index];
+            
+            // 1. Abre todas as ramificações (Nós pais) até chegar ao produto
+            let curr = targetNode.parent;
+            while (curr) {
+                if (curr._children) {
+                    curr.children = curr._children;
+                    curr._children = null;
+                }
+                curr = curr.parent;
+            }
+            
+            // 2. Atualiza a árvore para desenhar os caminhos que foram abertos
+            update(root);
+            saveTreeState();
+
+            // 3. Faz um "Zoom Cinematográfico" até à bolinha do produto pesquisado
+            const targetX = targetNode.y; // O D3 inverte x e y visualmente
+            const targetY = targetNode.x;
+            
+            svg.transition().duration(800).call(
+                zoom.transform, 
+                d3.zoomIdentity.translate(width / 2 - targetX, height / 2 - targetY).scale(1.5)
+            );
+
+            // 4. Abre a aba lateral para o utilizador ler os relatos
+            openPanel(targetNode.data);
         }
     </script>
 </body>
