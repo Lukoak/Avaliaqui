@@ -140,6 +140,14 @@
             0%, 40% { width: 16px; height: 16px; opacity: 0.8; }
             50%, 100% { width: 50px; height: 50px; opacity: 0; }
         }
+        
+        /* Ajuste de responsividade do painel */
+        @media (max-width: 768px) {
+            #side-panel {
+                width: 100%;
+                z-index: 100;
+            }
+        }
     </style>
 </head>
 <body class="bg-[#050505] text-gray-200 flex h-screen overflow-hidden font-sans select-none relative">
@@ -147,7 +155,7 @@
     <div class="scanlines"></div>
     <script>if (localStorage.getItem("theme") === "light") document.body.classList.add("light-mode");</script>
 
-    <div id="tutorial-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+    <div id="tutorial-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
         <div class="bg-[#0a0a0c] bg-panel border border-[#a855f7] border-line p-8 max-w-md w-full shadow-[0_0_30px_rgba(168,85,247,0.3)] body.light-mode:shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
             <h2 class="text-lg font-bold text-white font-mono mb-2 uppercase tracking-widest">> MANUAL_DO_SISTEMA</h2>
             <p class="text-sm text-gray-400 font-sans mb-6">Para explorar o diretório de produtos, clique nas <span class="text-[#a855f7] font-bold">esferas coloridas</span> que estão a pulsar ou nos <span class="text-white font-bold">nomes</span> para expandir os ramais da árvore.</p>
@@ -175,9 +183,9 @@
     </div>
 
     <main class="flex-1 flex flex-col min-w-0 relative">
-        <header class="h-14 border-b border-[#333] border-line flex items-center justify-between px-6 bg-[#0a0a0c] bg-panel z-[60] relative">
-            <div class="flex items-center gap-6">
-                <a href="arvore" class="text-lg font-bold tracking-widest text-[#a855f7] uppercase font-mono" style="text-shadow: 0 0 8px rgba(168,85,247,0.5);">
+        <header class="h-14 border-b border-[#333] border-line flex items-center justify-between px-4 md:px-6 bg-[#0a0a0c] bg-panel z-[60] relative">
+            <div class="flex items-center gap-4 md:gap-6">
+                <a href="arvore" class="text-base md:text-lg font-bold tracking-widest text-[#a855f7] uppercase font-mono" style="text-shadow: 0 0 8px rgba(168,85,247,0.5);">
                     AVALIA<span class="text-white">QUI</span>
                 </a>
                 <nav class="hidden md:flex gap-4 text-sm font-bold uppercase tracking-wider">
@@ -195,21 +203,21 @@
                 </nav>
             </div>
             
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 md:gap-4">
                 
-                <div class="w-64 hidden lg:block relative">
-                    <input type="text" id="search-input" autocomplete="off" placeholder="Buscar produto..." 
-                           class="w-full bg-[#111] input-light border border-[#333] border-line rounded-none py-1.5 px-3 text-sm focus:outline-none focus:border-[#a855f7] transition-colors">
+                <div class="w-40 md:w-64 relative">
+                    <input type="text" id="search-input" autocomplete="off" placeholder="Buscar..." 
+                           class="w-full bg-[#111] input-light border border-[#333] border-line rounded-none py-1.5 px-3 text-xs md:text-sm focus:outline-none focus:border-[#a855f7] transition-colors">
                     
-                    <div id="search-results" class="hidden absolute top-full left-0 w-full bg-[#0a0a0c] bg-panel border border-[#333] border-line mt-1 shadow-[4px_4px_0_rgba(0,0,0,0.8)] body.light-mode:shadow-[4px_4px_0_rgba(0,0,0,0.1)] z-[100] max-h-60 overflow-y-auto terminal-scroll divide-y divide-[#333] border-line">
+                    <div id="search-results" class="hidden absolute top-full left-0 w-full md:w-72 bg-[#0a0a0c] bg-panel border border-[#333] border-line mt-1 shadow-[4px_4px_0_rgba(0,0,0,0.8)] body.light-mode:shadow-[4px_4px_0_rgba(0,0,0,0.1)] z-[100] max-h-60 overflow-y-auto terminal-scroll divide-y divide-[#333] border-line">
                     </div>
                 </div>
 
-                <button onclick="toggleTheme()" id="theme-btn" class="text-[11px] font-mono text-gray-400 hover:text-white border border-[#333] border-line px-2 py-1 bg-[#111] bg-panel uppercase">
+                <button onclick="toggleTheme()" id="theme-btn" class="hidden sm:block text-[10px] md:text-[11px] font-mono text-gray-400 hover:text-white border border-[#333] border-line px-2 py-1 bg-[#111] bg-panel uppercase">
                     [ Modo Claro ]
                 </button>
 
-                <div class="flex items-center gap-3 border-l border-[#333] border-line pl-4 ml-2 relative" id="user-menu-container">
+                <div class="flex items-center gap-3 md:border-l border-[#333] border-line md:pl-4 md:ml-2 relative" id="user-menu-container">
                     <div class="text-right hidden sm:block">
                         <p class="text-xs font-bold text-white uppercase"><%= usuarioLogado.getNome() %></p>
                         <p class="text-[10px] text-[#a855f7] font-mono font-bold uppercase"><%= usuarioLogado.getPontuacao() %> pts</p>
@@ -219,7 +227,22 @@
                         <%= usuarioLogado.getNome().substring(0, 1) %>
                     </button>
 
-                    <div id="profile-dropdown" class="hidden absolute top-12 right-0 w-40 bg-[#0a0a0c] bg-panel border border-[#333] border-line z-[100] font-sans text-sm shadow-[4px_4px_0_rgba(0,0,0,0.8)] body.light-mode:shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
+                    <div id="profile-dropdown" class="hidden absolute top-12 right-0 w-48 bg-[#0a0a0c] bg-panel border border-[#333] border-line z-[100] font-sans text-sm shadow-[4px_4px_0_rgba(0,0,0,0.8)] body.light-mode:shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
+                        <div class="block md:hidden border-b border-[#333] border-line pb-2 mb-2 p-4">
+                            <p class="text-xs font-bold text-white uppercase"><%= usuarioLogado.getNome() %></p>
+                            <p class="text-[10px] text-[#a855f7] font-mono font-bold uppercase mb-2"><%= usuarioLogado.getPontuacao() %> pts</p>
+                            
+                            <% if (usuarioLogado.getPerfilAcesso().equals("Revisor") || usuarioLogado.getPerfilAcesso().equals("Administrador") || usuarioLogado.getPerfilAcesso().equals("Root")) { %>
+                                <a href="moderacao" class="block text-gray-400 hover:text-white mb-2 text-xs font-bold uppercase">Moderação</a>
+                            <% } %>
+                            <% if (usuarioLogado.getPerfilAcesso().equals("Suporte")) { %>
+                                <a href="admin" class="block text-gray-400 hover:text-white text-xs font-bold uppercase">Contas_SYS</a>
+                            <% } else if (usuarioLogado.getPerfilAcesso().equals("Administrador") || usuarioLogado.getPerfilAcesso().equals("Root")) { %>
+                                <a href="admin" class="block text-gray-400 hover:text-white text-xs font-bold uppercase">Painel_Admin</a>
+                            <% } %>
+                            <button onclick="toggleTheme()" class="mt-4 text-[10px] font-mono text-gray-400 hover:text-white border border-[#333] px-2 py-1 uppercase w-full">Tema</button>
+                        </div>
+
                         <a href="perfil" class="block px-4 py-2 text-gray-300 menu-item border-b border-[#333] border-line font-bold">Meu Perfil</a>
                         <a href="login.jsp" class="block px-4 py-2 text-red-500 hover-logout font-bold">Sair</a>
                     </div>
@@ -246,7 +269,7 @@
             <% } %>
         </div>
 
-        <div id="tree-container" class="flex-1 overflow-hidden space-background cursor-grab active:cursor-grabbing z-0 relative"></div>
+        <div id="tree-container" class="flex-1 overflow-hidden space-background cursor-grab active:cursor-grabbing z-0 relative w-full h-full"></div>
     </main>
 
     <aside id="side-panel" class="w-[400px] bg-[#0a0a0c] bg-panel border-l border-[#333] border-line flex flex-col h-full translate-x-full transition-transform duration-300 ease-in-out absolute right-0 z-[70] shadow-[-8px_0_20px_rgba(0,0,0,0.8)] body.light-mode:shadow-[-4px_0_15px_rgba(0,0,0,0.1)]">
@@ -296,12 +319,18 @@
         function toggleTheme() {
             const isLight = document.body.classList.toggle("light-mode");
             localStorage.setItem("theme", isLight ? "light" : "dark");
-            document.getElementById("theme-btn").innerText = isLight ? '[ MODO ESCURO ]' : '[ MODO CLARO ]';
+            
+            const btn = document.getElementById("theme-btn");
+            if(btn) btn.innerText = isLight ? '[ MODO ESCURO ]' : '[ MODO CLARO ]';
+            
             update(root);
         }
 
         window.onload = function() {
-            if (localStorage.getItem("theme") === "light") document.getElementById("theme-btn").innerText = '[ MODO ESCURO ]';
+            if (localStorage.getItem("theme") === "light") {
+                const btn = document.getElementById("theme-btn");
+                if(btn) btn.innerText = '[ MODO ESCURO ]';
+            }
         };
 
         function toggleDropdown(event) {
@@ -309,45 +338,53 @@
             document.getElementById('profile-dropdown').classList.toggle('hidden');
         }
 
-        window.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('profile-dropdown');
-            const menuContainer = document.getElementById('user-menu-container');
-            if (!dropdown.classList.contains('hidden') && !menuContainer.contains(event.target)) dropdown.classList.add('hidden');
-        });
-
         // --- D3.JS: ÁRVORE E SALVAMENTO DE CONTEXTO ---
         const treeData = <%= request.getAttribute("treeDataJSON") %>;
+        let svgGroup, zoom, root, width, height, margin;
+        let i = 0, duration = 400;
+        let treemap;
 
-        const containerInfo = document.getElementById('tree-container').getBoundingClientRect();
-        const width = containerInfo.width;
-        const height = containerInfo.height;
-        const margin = {top: 20, right: 120, bottom: 20, left: 150};
+        function renderizarArvore() {
+            // Limpa svg existente (para resize)
+            d3.select("#tree-container").selectAll("*").remove();
 
-        const zoom = d3.zoom().scaleExtent([0.3, 4]).on("zoom", function(event) { svgGroup.attr("transform", event.transform); });
-        const svg = d3.select("#tree-container").append("svg").attr("width", "100%").attr("height", "100%").call(zoom).on("dblclick.zoom", null);
-        const svgGroup = svg.append("g");
-        svg.call(zoom.transform, d3.zoomIdentity.translate(margin.left, height / 2));
+            const containerInfo = document.getElementById('tree-container').getBoundingClientRect();
+            width = containerInfo.width;
+            height = containerInfo.height;
+            margin = {top: 20, right: 120, bottom: 20, left: 150};
 
-        let i = 0, duration = 400, root;
-        const treemap = d3.tree().nodeSize([35, 220]);
+            zoom = d3.zoom().scaleExtent([0.3, 4]).on("zoom", function(event) { svgGroup.attr("transform", event.transform); });
+            const svg = d3.select("#tree-container").append("svg").attr("width", "100%").attr("height", "100%").call(zoom).on("dblclick.zoom", null);
+            svgGroup = svg.append("g");
+            svg.call(zoom.transform, d3.zoomIdentity.translate(margin.left, height / 2));
 
-        root = d3.hierarchy(treeData, function(d) { return d.children; });
-        root.x0 = 0; root.y0 = 0;
+            treemap = d3.tree().nodeSize([35, 220]);
 
-        let openNodes = JSON.parse(localStorage.getItem("openTreeNodes")) || ["Avaliaqui"];
+            root = d3.hierarchy(treeData, function(d) { return d.children; });
+            root.x0 = 0; root.y0 = 0;
 
-        function initTreeState(d) {
-            if (d.children) {
-                if (!openNodes.includes(d.data.name)) {
-                    d._children = d.children;
-                    d.children = null;
+            let openNodes = JSON.parse(localStorage.getItem("openTreeNodes")) || ["Avaliaqui"];
+
+            function initTreeState(d) {
+                if (d.children) {
+                    if (!openNodes.includes(d.data.name)) {
+                        d._children = d.children;
+                        d.children = null;
+                    }
+                    if (d.children) d.children.forEach(initTreeState);
+                    if (d._children) d._children.forEach(initTreeState);
                 }
-                if (d.children) d.children.forEach(initTreeState);
-                if (d._children) d._children.forEach(initTreeState);
             }
+            initTreeState(root);
+            update(root);
         }
-        initTreeState(root);
-        update(root);
+
+        renderizarArvore(); // Chamada Inicial
+
+        // Resize Observer (Torna a tela D3 responsiva ao virar o celular ou redimensionar aba)
+        window.addEventListener('resize', function() {
+            renderizarArvore();
+        });
 
         function saveTreeState() {
             let opened = [];
@@ -534,36 +571,66 @@
         let matchesGlobais = [];
 
         function mapearProdutos(node) {
-            if (node.type === "produto") todosProdutos.push(node);
-            if (node.children) node.children.forEach(mapearProdutos);
+            if (node.type === "produto") {
+                todosProdutos.push(node);
+            }
+            if (node.children) {
+                node.children.forEach(mapearProdutos);
+            }
         }
-        if (treeData) mapearProdutos(treeData);
+        
+        if (typeof treeData !== 'undefined' && treeData) {
+            mapearProdutos(treeData);
+        }
 
         searchInput.addEventListener('input', function() {
             const termo = this.value.toLowerCase().trim();
-            if (termo.length === 0) { searchResults.classList.add('hidden'); return; }
+            
+            searchResults.innerHTML = '';
+            
+            if (termo.length === 0) { 
+                searchResults.classList.add('hidden'); 
+                return; 
+            }
 
             matchesGlobais = todosProdutos.filter(p => 
-                p.name.toLowerCase().includes(termo) || p.brand.toLowerCase().includes(termo) || p.category.toLowerCase().includes(termo)
+                p.name.toLowerCase().includes(termo) || 
+                p.brand.toLowerCase().includes(termo) || 
+                p.category.toLowerCase().includes(termo)
             );
 
             if (matchesGlobais.length > 0) {
-                let html = '';
                 matchesGlobais.forEach((match, index) => {
-                    html += "<div class='p-3 hover:bg-[#111] input-light cursor-pointer transition-colors' onclick='selecionarResultadoBusca(" + index + ")'>" +
-                        "<p class='text-sm font-bold text-white uppercase font-mono'>" + match.name + "</p>" +
-                        "<p class='text-[9px] font-mono text-[#a855f7] uppercase mt-0.5'>> " + match.category + " > " + match.brand + "</p>" +
-                    "</div>";
+                    const div = document.createElement('div');
+                    div.className = 'p-3 hover:bg-[#111] input-light cursor-pointer transition-colors';
+                    div.onclick = function() { selecionarResultadoBusca(index); };
+
+                    const pTitle = document.createElement('p');
+                    pTitle.className = 'text-sm font-bold text-white uppercase font-mono';
+                    pTitle.textContent = match.name;
+
+                    const pPath = document.createElement('p');
+                    pPath.className = 'text-[9px] font-mono text-[#a855f7] uppercase mt-0.5';
+                    pPath.textContent = '> ' + match.category + ' > ' + match.brand;
+
+                    div.appendChild(pTitle);
+                    div.appendChild(pPath);
+                    searchResults.appendChild(div);
                 });
-                searchResults.innerHTML = html;
             } else {
-                searchResults.innerHTML = "<div class='p-4 text-[10px] font-mono text-red-500 uppercase tracking-widest text-center'>[ RESULTADO_NÃO_ENCONTRADO ]</div>";
+                const divErro = document.createElement('div');
+                divErro.className = 'p-4 text-[10px] font-mono text-red-500 uppercase tracking-widest text-center';
+                divErro.textContent = '[ RESULTADO_NÃO_ENCONTRADO ]';
+                searchResults.appendChild(divErro);
             }
+            
             searchResults.classList.remove('hidden');
         });
 
         document.addEventListener('click', function(event) {
-            if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) searchResults.classList.add('hidden');
+            if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
+                searchResults.classList.add('hidden');
+            }
         });
 
         function selecionarResultadoBusca(index) {
