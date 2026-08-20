@@ -33,7 +33,6 @@ public class AdminServlet extends HttpServlet {
             return;
         }
 
-        // CARREGA TODAS AS LISTAS PARA AS PLANILHAS DO PROFESSOR
         request.setAttribute("listaUsuarios", usuarioDAO.listarTodos());
         request.setAttribute("listaCategorias", arvoreDAO.listarCategorias());
         request.setAttribute("listaMarcas", arvoreDAO.listarMarcas());
@@ -45,7 +44,6 @@ public class AdminServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String acao = request.getParameter("acao");
 
-        // GESTÃO DE USUÁRIOS
         if ("suspender".equals(acao)) {
             Long id = Long.parseLong(request.getParameter("usuarioId"));
             if (usuarioDAO.atualizarStatus(id, "Suspenso")) request.setAttribute("mensagemSucesso", "Nó de utilizador SUSPENSO com sucesso.");
@@ -60,7 +58,6 @@ public class AdminServlet extends HttpServlet {
             if (usuarioDAO.atualizarPerfil(id, novoCargo)) request.setAttribute("mensagemSucesso", "Privilégios atualizados para " + novoCargo + ".");
         }
         
-        // GESTÃO DA ÁRVORE (CRIAR)
         else if ("criarCategoria".equals(acao)) {
             String nome = request.getParameter("nome_no");
             if (arvoreDAO.criarCategoria(nome, null)) request.setAttribute("mensagemSucesso", "Categoria Raiz injetada com sucesso.");
@@ -76,7 +73,6 @@ public class AdminServlet extends HttpServlet {
             if (arvoreDAO.criarProduto(nome, Long.parseLong(parentId))) request.setAttribute("mensagemSucesso", "Produto injetado com sucesso.");
         }
         
-        // GESTÃO DA ÁRVORE (EXCLUIR EM CASCATA)
         else if ("excluirNode".equals(acao)) {
             String tipo = request.getParameter("tipo_no");
             Long id = Long.parseLong(request.getParameter("id_no"));
